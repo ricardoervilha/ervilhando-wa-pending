@@ -12,13 +12,17 @@ body{font-family:-apple-system,system-ui,sans-serif;background:#09090b;color:#fa
 .header p{font-size:12px;color:#52525b;margin-top:4px}
 .status{font-size:11px;color:#71717a;text-align:center;margin-bottom:16px}
 .post{background:#18181b;border:1px solid rgba(255,255,255,.06);border-radius:16px;margin-bottom:12px;overflow:hidden}
-.post img{width:100%;max-height:200px;object-fit:contain;background:#0f0f13;padding:8px}
-.post-body{padding:14px}
+.post img{width:100%;max-height:240px;object-fit:contain;background:#0f0f13;padding:12px}
+.post .no-img{height:80px;background:#0f0f13;display:flex;align-items:center;justify-content:center;font-size:32px;opacity:.15}
+.post-body{padding:16px}
 .post-text{font-size:14px;line-height:1.6;white-space:pre-wrap;word-break:break-word;color:#e4e4e7}
 .post-meta{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.04);font-size:11px;color:#52525b}
+.post-actions{display:flex;gap:8px}
 .copy-btn{background:#22c55e;color:#000;border:none;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
 .copy-btn:active{transform:scale(.95)}
 .copy-btn.done{background:#166534;color:#22c55e}
+.save-img{background:rgba(255,255,255,.06);color:#a1a1aa;border:1px solid rgba(255,255,255,.1);padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer}
+.save-img:active{background:rgba(255,255,255,.1)}
 .empty{text-align:center;padding:60px 20px;color:#3f3f46}
 .empty span{font-size:40px;display:block;margin-bottom:12px}
 .refresh{display:block;margin:20px auto;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#a1a1aa;padding:10px 24px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
@@ -50,13 +54,19 @@ if (POSTS.length === 0) {
     const div = document.createElement('div');
     div.className = 'post';
     let html = '';
-    if (p.image) html += '<img src="' + p.image + '" onerror="this.style.display=\'none\'" loading="lazy">';
+    if (p.image) {
+      html += '<img src="' + p.image + '" id="img-' + i + '" onerror="this.outerHTML=\'<div class=no-img>📦</div>\'" loading="lazy">';
+    } else {
+      html += '<div class="no-img">📦</div>';
+    }
     html += '<div class="post-body">';
     html += '<div class="post-text">' + escapeHtml(p.text) + '</div>';
     html += '<div class="post-meta">';
     html += '<span>#' + p.id + ' · ' + p.merchant + '</span>';
-    html += '<button class="copy-btn" onclick="copyPost(this,' + i + ')">Copiar texto</button>';
-    html += '</div></div>';
+    html += '<div class="post-actions">';
+    if (p.image) html += '<a class="save-img" href="' + p.image + '" download="deal-' + p.id + '.jpg" target="_blank">📷 Salvar foto</a>';
+    html += '<button class="copy-btn" onclick="copyPost(this,' + i + ')">📋 Copiar</button>';
+    html += '</div></div></div>';
     div.innerHTML = html;
     container.appendChild(div);
   });
