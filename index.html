@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ervilhando — WhatsApp Pendentes</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,system-ui,sans-serif;background:#09090b;color:#fafafa;min-height:100vh;padding:16px}
+.header{text-align:center;padding:16px 0 24px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:20px}
+.header h1{font-size:18px;font-weight:700;color:#22c55e}
+.header p{font-size:12px;color:#52525b;margin-top:4px}
+.status{font-size:11px;color:#71717a;text-align:center;margin-bottom:16px}
+.post{background:#18181b;border:1px solid rgba(255,255,255,.06);border-radius:16px;margin-bottom:12px;overflow:hidden}
+.post img{width:100%;max-height:200px;object-fit:contain;background:#0f0f13;padding:8px}
+.post-body{padding:14px}
+.post-text{font-size:14px;line-height:1.6;white-space:pre-wrap;word-break:break-word;color:#e4e4e7}
+.post-meta{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.04);font-size:11px;color:#52525b}
+.copy-btn{background:#22c55e;color:#000;border:none;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+.copy-btn:active{transform:scale(.95)}
+.copy-btn.done{background:#166534;color:#22c55e}
+.empty{text-align:center;padding:60px 20px;color:#3f3f46}
+.empty span{font-size:40px;display:block;margin-bottom:12px}
+.refresh{display:block;margin:20px auto;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#a1a1aa;padding:10px 24px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
+.refresh:active{background:rgba(255,255,255,.08)}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🟢 Ervilhando</h1>
+  <p>Posts pendentes para WhatsApp</p>
+</div>
+<div class="status" id="status">Carregando...</div>
+<div id="posts"></div>
+<button class="refresh" onclick="location.reload()">↻ Atualizar</button>
+
+<script>
+// Posts are injected at build time by the deploy script
+const POSTS = __POSTS_DATA__;
+
+const container = document.getElementById('posts');
+const status = document.getElementById('status');
+
+if (POSTS.length === 0) {
+  container.innerHTML = '<div class="empty"><span>✅</span>Nenhum post pendente<br><small>Tudo já foi postado!</small></div>';
+  status.textContent = 'Nenhum post pendente';
+} else {
+  status.textContent = POSTS.length + ' posts pendentes — Atualizado: ' + new Date().toLocaleString('pt-BR');
+  POSTS.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'post';
+    let html = '';
+    if (p.image) html += '<img src="' + p.image + '" onerror="this.style.display=\'none\'" loading="lazy">';
+    html += '<div class="post-body">';
+    html += '<div class="post-text">' + escapeHtml(p.text) + '</div>';
+    html += '<div class="post-meta">';
+    html += '<span>#' + p.id + ' · ' + p.merchant + '</span>';
+    html += '<button class="copy-btn" onclick="copyPost(this,' + i + ')">Copiar texto</button>';
+    html += '</div></div>';
+    div.innerHTML = html;
+    container.appendChild(div);
+  });
+}
+
+function copyPost(btn, idx) {
+  navigator.clipboard.writeText(POSTS[idx].text);
+  btn.textContent = '✓ Copiado!';
+  btn.className = 'copy-btn done';
+  setTimeout(() => { btn.textContent = 'Copiar texto'; btn.className = 'copy-btn'; }, 2000);
+}
+
+function escapeHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
